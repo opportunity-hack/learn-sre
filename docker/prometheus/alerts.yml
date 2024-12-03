@@ -1,0 +1,38 @@
+groups:
+  - name: application
+    rules:
+      - alert: HighErrorRate
+        expr: rate(app_error_count_total[5m]) > 0.1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: High error rate detected
+          description: Error rate is above 10% for 5 minutes
+
+      - alert: LatencySpike
+        expr: rate(app_request_latency_seconds_sum[5m]) / rate(app_request_latency_seconds_count[5m]) > 1
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: High latency detected
+          description: Average request latency is above 1 second
+
+      - alert: ServiceDown
+        expr: up == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: Service is down
+          description: The service has been down for more than 1 minute
+
+      - alert: HighMemoryUsage
+        expr: process_resident_memory_bytes / 1024 / 1024 > 500
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: High memory usage
+          description: Memory usage above 500MB for 5 minutes

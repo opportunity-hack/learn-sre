@@ -1,0 +1,80 @@
+version: '3'
+
+services:
+  init:
+    image: &tempo_image grafana/tempo:2.3.1
+    user: root
+    entrypoint:
+      - "chown"
+      - "10001:10001"
+      - "/var/tempo"
+    volumes:
+      - tempo_data:/var/tempo
+
+  memcached:
+    image: memcached:1.6.29
+    ports:
+      - "11211:11211"
+    environment:
+      - MEMCACHED_MAX_MEMORY=64m
+      - MEMCACHED_THREADS=4
+
+  app:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - TEMPO_ENDPOINT=tempo:4317
+    depends_on:
+      tempo:
+        condition: service_healthy
+      prometheus:
+        condition: service_started
+
+  prometheus:
+    image: prom/prometheus:latest
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./docker/prometheus:/etc/prometheus
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+
+  tempo:
+    image: *tempo_image
+    command: ["-config.file=/etc/tempo/tempo.yaml"]
+    volumes:
+      - ./docker/tempo:/etc/tempo
+      - tempo_data:/var/tempo
+    ports:
+      - "4317:4317"
+      - "3200:3200"
+    depends_on:
+      - init
+      - memcached
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3200/ready"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 5s
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./docker/grafana/datasources.yml:/etc/grafana/provisioning/datasources/datasources.yml
+      - ./docker/grafana/dashboards:/etc/grafana/provisioning/dashboards
+      - grafana_data:/var/lib/grafana
+    depends_on:
+      - prometheus
+      - tempo
+
+volumes:
+  prometheus_data:
+  grafana_data:
+  tempo_data:
+    driver: local
