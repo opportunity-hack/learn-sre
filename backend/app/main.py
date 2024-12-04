@@ -66,6 +66,12 @@ async def get_product(product_id: int):
             # Add more detailed span attributes
             span.set_attribute("product.id", product_id)
             span.set_attribute("request.type", "get_product")
+
+            # Simulate database query latency
+            simulate_db_query(span)
+
+            # Simulate external service call (e.g., recommendation engine)
+            simulate_external_service(span)
             
             if product_id not in PRODUCTS:
                 span.set_attribute("error", True)
@@ -140,4 +146,53 @@ async def purchase_product(product_id: int):
             REQUEST_LATENCY.labels(endpoint="/purchase").observe(
                 time.time() - start_time
             )
-     
+@app.get("/products/search")
+async def search_products(query: str):
+    with tracer.start_as_current_span("search_products") as span:
+        start_time = time.time()
+        try:
+            # Simulate database query latency
+            simulate_db_query(span)
+            
+            # Simulate external service call (e.g., recommendation engine)
+            simulate_external_service(span)
+            
+            # Filter products (simple mock implementation)
+            results = [
+                product for product in PRODUCTS.values() 
+                if query.lower() in product["name"].lower()
+            ]
+            
+            span.set_attribute("search.query", query)
+            span.set_attribute("search.results_count", len(results))
+            REQUEST_COUNT.labels(endpoint="/products/search", status="success").inc()
+            return results
+            
+        except Exception as e:
+            span.set_attribute("error", True)
+            span.set_attribute("error.message", str(e))
+            ERROR_COUNT.labels(error_type="search_error").inc()
+            raise
+        finally:
+            REQUEST_LATENCY.labels(endpoint="/products/search").observe(
+                time.time() - start_time
+            )
+
+def simulate_db_query(span):    
+    with tracer.start_span("db_query") as db_span:
+        # Set db_span to child of parent span        
+        # Simulate variable database query time
+        delay = random.uniform(0.4, 0.55)
+        time.sleep(delay)
+        db_span.set_attribute("db.query_time", delay)
+        if random.random() < 0.1:  # 10% chance of db error
+            raise Exception("Database connection timeout")
+
+def simulate_external_service(span):
+    with tracer.start_span("recommendation_service") as service_span:
+        # Simulate external API call
+        delay = random.uniform(0.2, 0.25)
+        time.sleep(delay)
+        service_span.set_attribute("service.response_time", delay)
+        if random.random() < 0.05:  # 5% chance of service error
+            raise Exception("External service unavailable")

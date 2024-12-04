@@ -3,6 +3,9 @@ from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExport
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import BatchSpanProcessor
 from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
+from opentelemetry.sdk.resources import Resource  # Add this
+from opentelemetry.semconv.resource import ResourceAttributes  # Add this
+
 from prometheus_client import Counter, Histogram, generate_latest, CONTENT_TYPE_LATEST
 import os
 import time
@@ -49,8 +52,14 @@ def setup_monitoring(app):
     if not wait_for_tempo():
         logger.warning("Tempo not available, but continuing anyway...")
 
+    # Create a Resource to identify your service
+    resource = Resource.create({
+        ResourceAttributes.SERVICE_NAME: "product-api",  # This will be the service name in Tempo
+        ResourceAttributes.DEPLOYMENT_ENVIRONMENT: "development"
+    })
+
     # Set up OpenTelemetry tracer
-    tracer_provider = TracerProvider()
+    tracer_provider = TracerProvider(resource=resource)
     otlp_exporter = OTLPSpanExporter(
         endpoint=os.getenv("TEMPO_ENDPOINT", "tempo:4317"),
         insecure=True
