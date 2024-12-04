@@ -9,7 +9,13 @@ scrape_configs:
     params:
       format: [prometheus]
     static_configs:
-      - targets: ['app:8000']
+      - targets: ['backend:8000']
+
+  - job_name: 'frontend'
+    static_configs:
+      - targets: ['frontend-metrics:9091']
+    metrics_path: '/metrics'
+    scrape_interval: 5s
 
   - job_name: 'tempo'
     static_configs:

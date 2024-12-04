@@ -1,0 +1,10 @@
+FROM node:18-slim
+
+WORKDIR /app
+COPY server/package*.json ./
+COPY server ./server
+
+RUN cd server && npm install
+
+EXPOSE 9091
+CMD ["node", "server/metrics.cjs"]

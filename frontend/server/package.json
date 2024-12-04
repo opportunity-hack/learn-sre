@@ -1,0 +1,11 @@
+
+{
+  "name": "frontend-metrics-server",
+  "version": "1.0.0",
+  "type": "commonjs",
+  "dependencies": {
+    "express": "^4.18.2",
+    "prom-client": "^14.2.0",
+    "cors": "^2.8.5"
+  }
+}

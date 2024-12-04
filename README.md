@@ -42,3 +42,78 @@ fly deploy
 - Metrics: Available in Prometheus
 - Traces: Available in Tempo
 - Dashboards: Preconfigured in Grafana
+
+
+# Architecture Overview
+
+This application implements a modern observability stack with the following components:
+
+## User Interface Layer
+- **Browser**: Accesses the application through port 5173
+- **Frontend**: React application serving the user interface
+- **Frontend Metrics**: Dedicated service collecting frontend telemetry (port 9091)
+
+## Application Layer
+- **Backend API**: FastAPI service handling business logic (port 8000)
+- Communicates with observability services for monitoring and tracing
+
+## Observability Stack
+- **Prometheus**: Metrics collection and storage (port 9090)
+- **Tempo**: Distributed tracing backend (ports 4317, 3200)
+- **Grafana**: Visualization and dashboards (port 3000)
+- **Memcached**: Caching layer for Tempo
+
+## Persistent Storage
+- Dedicated volumes for Prometheus, Grafana, and Tempo data
+- Ensures data persistence across container restarts
+
+## Key Features
+- Complete observability pipeline with metrics, traces, and visualization
+- Frontend and backend telemetry collection
+- Persistent storage for all observability data
+- Containerized services with health checks
+- Automatic service discovery and configuration
+
+
+```
+📱 User (Browser)
+          |
+          | :5173
+          ▼
+  +----------------+            +-----------------+
+  |    Frontend    |---------->|  Frontend       |
+  |    (React)     |   :9091  |   Metrics       |
+  +----------------+            +-----------------+
+          |                            |
+          | :8000                      |
+          ▼                            |
+  +----------------+                   |
+  |    Backend     |                   |
+  |    (FastAPI)   |                   |
+  +----------------+                   |
+          |                           |
+          |                           |
+    :4317 |                          | :9090
+          ▼                          ▼
+  +----------------+            +-----------------+
+  |     Tempo      |<----------|   Prometheus    |
+  |   (Tracing)    |            |    (Metrics)   |
+  +----------------+            +-----------------+
+          |                            |
+          |                            |
+          |            +---------------+
+          |            |
+          ▼            ▼
+  +--------------------------------+
+  |           Grafana              |
+  |  (Dashboards & Visualization)  |
+  |            :3000               |
+  +--------------------------------+
+              |
+    +---------+---------+
+    |                   |
++----------+      +-----------+
+|  Tempo   |      |Prometheus |
+| Volume   |      |  Volume   |
++----------+      +-----------+
+```

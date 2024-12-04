@@ -19,8 +19,8 @@ services:
       - MEMCACHED_MAX_MEMORY=64m
       - MEMCACHED_THREADS=4
 
-  app:
-    build: .
+  backend:
+    build: ./backend
     ports:
       - "8000:8000"
     environment:
@@ -30,6 +30,24 @@ services:
         condition: service_healthy
       prometheus:
         condition: service_started
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "5173:5173"
+    environment:
+      - VITE_API_URL=http://localhost:8000
+    depends_on:
+    - backend
+
+  frontend-metrics:
+    build: 
+      context: ./frontend
+      dockerfile: Dockerfile.metrics
+    ports:
+      - "9091:9091"
+    depends_on:
+      - frontend
 
   prometheus:
     image: prom/prometheus:latest
