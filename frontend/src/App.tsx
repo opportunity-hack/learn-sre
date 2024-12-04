@@ -11,8 +11,8 @@ interface Product {
 }
 
 const BACKEND_URL = window.location.href.includes('-5173.')
-    ? window.location.href.replace('-5173.', '-8000.')
-    : window.location.origin;
+    ? window.location.href.replace('-5173.', '-8000.').replace(/\/$/, '')
+    : window.location.origin.replace(/\/$/, '');
 
 const App = () => {
     const [products, setProducts] = useState<Product[]>([]);
