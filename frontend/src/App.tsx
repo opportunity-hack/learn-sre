@@ -10,7 +10,9 @@ interface Product {
     stock: number;
 }
 
-const BACKEND_URL = 'http://localhost:8000';
+const BACKEND_URL = window.location.href.includes('-5173.')
+    ? window.location.href.replace('-5173.', '-8000.')
+    : window.location.origin;
 
 const App = () => {
     const [products, setProducts] = useState<Product[]>([]);

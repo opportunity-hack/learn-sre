@@ -59,7 +59,7 @@ This application implements a modern observability stack with the following comp
 
 ## Observability Stack
 - **Prometheus**: Metrics collection and storage (port 9090)
-- **Tempo**: Distributed tracing backend (ports 4317, 3200)
+- **[Tempo](https://grafana.com/docs/tempo/next/getting-started/docker-example/)**: Distributed tracing backend (ports 4317, 3200)
 - **Grafana**: Visualization and dashboards (port 3000)
 - **Memcached**: Caching layer for Tempo
 
