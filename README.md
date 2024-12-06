@@ -1,3 +1,5 @@
+# --> [Google Slides](https://docs.google.com/presentation/d/1EnIlTz4GOn7v_loYxYFGeaaMxbpW5xnK3mo23KMuIFc/edit?usp=sharing)
+
 # Monitoring Demo
 
 A FastAPI application with full observability stack including Prometheus, Tempo, and Grafana.
