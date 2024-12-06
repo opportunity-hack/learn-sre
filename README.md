@@ -8,29 +8,26 @@ A FastAPI application with full observability stack including Prometheus, Tempo,
 ```bash
 docker-compose up --build
 ```
+**NOTE:** It takes a hot 20 seconds for everything to start
+
+To wipe clean and start new
+```
+docker-compose down -v
+```
 
 2. Access:
-- App: http://localhost:8000
+- Frontend: http://localhost:5173 
+ - Frontend metrics: http://localhost:9001
+- Backend: http://localhost:8000
 - Grafana: http://localhost:3000
 - Prometheus: http://localhost:9090
 
-## Fly.io Deployment
-
-1. Install Fly CLI:
-```bash
-curl -L https://fly.io/install.sh | sh
-flyctl auth login
+## Load Test
 ```
-
-2. Deploy:
-```bash
-fly launch
-fly volumes create tempo_data --size 1
-fly volumes create prometheus_data --size 1
-fly volumes create grafana_data --size 1
-fly deploy
+pip install aiohttp rich
+python load_test.py --url http://localhost:8001 --requests 1000 --concurrent 10
 ```
-
+https://orange-waddle-v7wpg56q6pcwgqr-8000.app.github.dev/
 ## Endpoints
 
 - `/`: Health check

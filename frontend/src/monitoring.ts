@@ -2,7 +2,13 @@
 import axios from 'axios';
 
 class MonitoringService {
-    private metricsEndpoint = 'http://localhost:9091/collect';
+    private metricsEndpoint: string;
+
+    constructor() {
+        this.metricsEndpoint = window.location.hostname.includes('app.github.dev')
+            ? window.location.href.replace('5173', '9091') + 'collect'
+            : 'http://localhost:9091/collect';
+    }
 
     async recordApiLatency(endpoint: string, duration: number) {
         await this.sendMetric('frontend_api_latency', duration, { endpoint });

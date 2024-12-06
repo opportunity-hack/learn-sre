@@ -1,0 +1,1 @@
+python load_test.py --url http://${CODESPACE_NAME}-8000.app.github.dev --requests 1000 --concurrent 10
