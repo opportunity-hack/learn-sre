@@ -182,7 +182,7 @@ def simulate_db_query(span):
     with tracer.start_span("db_query") as db_span:
         # Set db_span to child of parent span        
         # Simulate variable database query time
-        delay = random.uniform(0.2, 0.55)
+        delay = random.uniform(0.2, 1.55)
         time.sleep(delay)
         db_span.set_attribute("db.query_time", delay)
         if random.random() < 0.01:  # 1% chance of db error
@@ -191,7 +191,7 @@ def simulate_db_query(span):
 def simulate_external_service(span):
     with tracer.start_span("recommendation_service") as service_span:
         # Simulate external API call
-        delay = random.uniform(0.05, 0.25)
+        delay = random.uniform(0.05, 1.25)
         time.sleep(delay)
         service_span.set_attribute("service.response_time", delay)
         if random.random() < 0.01:  # 1% chance of service error
